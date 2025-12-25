@@ -1,11 +1,113 @@
+
 spring:
+  config:
+    activate:
+      on-profile: master-only
   datasource:
-    url: jdbc:postgresql://localhost:5433/network
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
+    master:
+      jdbc-url: jdbc:postgresql://localhost:5433/social_network
+      username: postgres
+      password: postgres
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 2
+        connection-timeout: 60000
+        initialization-fail-timeout: 0
 
 app:
   jwt:
     secret: mySuperSecretKeyThatIsAtLeast32CharactersLong!
     expiration: 86400000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+  info:
+    env:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.jdbc.datasource: DEBUG
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: replication
+
+  datasource:
+    master:
+      jdbc-url: jdbc:postgresql://localhost:5433/social_network
+      username: postgres
+      password: postgres
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 2
+        connection-timeout: 60000
+        initialization-fail-timeout: 0
+    slave:
+      jdbc-url: jdbc:postgresql://localhost:5434/social_network
+      username: postgres
+      password: postgres
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 2
+        connection-timeout: 60000
+        initialization-fail-timeout: 0
+    asyncslave:
+      jdbc-url: jdbc:postgresql://localhost:5435/social_network
+      username: postgres
+      password: postgres
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 2
+        connection-timeout: 60000
+        initialization-fail-timeout: 0
+
+app:
+  jwt:
+    secret: mySuperSecretKeyThatIsAtLeast32CharactersLong!
+    expiration: 86400000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+  info:
+    env:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.jdbc.datasource: DEBUG

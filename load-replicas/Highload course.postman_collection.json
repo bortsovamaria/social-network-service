@@ -1,0 +1,183 @@
+{
+	"info": {
+		"_postman_id": "1abade00-f6fd-481a-a7eb-544442225aa0",
+		"name": "Highload course",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34714454"
+	},
+	"item": [
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseJson = pm.response.json();\r",
+							"pm.globals.set(\"token\", responseJson.token);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJpYUB0ZXN0LmNvbSIsImlhdCI6MTc2NDA5Mzc2MSwiZXhwIjoxNzY0MTgwMTYxfQ.XF4OSedDQpM-2o-quiejJmDM6ban7XFv5oxd-iQOclI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"maria12@test.com\",\r\n    \"password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v0/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v0",
+						"api",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Maria\",\r\n    \"lastName\": \"Bortsova\",\r\n    \"birthDate\": \"1996-01-01T10:00:00\",\r\n    \"biography\": \"Java Developer\",\r\n    \"city\": \"Moscow\",\r\n    \"email\": \"maria12@test.com\",\r\n    \"password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v0/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v0",
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get by id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Maria\",\r\n    \"secondName\": \"Bortsova\",\r\n    \"birthdate\": \"10-10-1010\",\r\n    \"biography\": \"Java Developer\",\r\n    \"city\": \"Moscow\",\r\n    \"password\": \"12345\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v0/api/users/f6651aa6-253d-4355-900f-82e940cd8633",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v0",
+						"api",
+						"users",
+						"f6651aa6-253d-4355-900f-82e940cd8633"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get by first name last name",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v0/api/users/search?firstName=M&lastName=B",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v0",
+						"api",
+						"users",
+						"search"
+					],
+					"query": [
+						{
+							"key": "firstName",
+							"value": "M"
+						},
+						{
+							"key": "lastName",
+							"value": "B"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

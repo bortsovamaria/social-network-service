@@ -2,6 +2,8 @@ package com.otus.highload.repository;
 
 import com.otus.highload.model.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class UserRepository {
@@ -60,7 +63,13 @@ public class UserRepository {
 
     public Optional<User> findByEmail(String email) {
         String sql = "SELECT * FROM users WHERE email = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, email));
+        try {
+            User user = jdbcTemplate.queryForObject(sql, userRowMapper, email);
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException e) {
+            log.debug("User not found with email: {}", email);
+            return Optional.empty();
+        }
     }
 
     private final RowMapper<User> userRowMapper = (rs, rowNum) -> {
