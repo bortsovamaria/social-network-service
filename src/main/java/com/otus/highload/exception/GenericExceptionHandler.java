@@ -1,6 +1,6 @@
 package com.otus.highload.exception;
 
-import com.otus.highload.model.ErrorResponse;
+import com.otus.highload.model.error.ErrorResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

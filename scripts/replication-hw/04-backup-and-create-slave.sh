@@ -26,14 +26,14 @@ pg_basebackup -h pgmaster -D /$SLAVE_NAME -U replicator -v -P --wal-method=strea
 
 # Копируем бэкап на хост
 echo "📋 Copying backup to host..."
-docker cp pgmaster:/pgslave ../volumes/$SLAVE_NAME
+docker cp pgmaster:/pgslave ../../volumes/$SLAVE_NAME
 
 # Создаем сигнальный файл для реплики
-touch ../volumes/$SLAVE_NAME/standby.signal
+touch ../../volumes/$SLAVE_NAME/standby.signal
 
 # Настраиваем конфиг реплики
 echo "🔧 Configuring replica..."
-cat > ../volumes/$SLAVE_NAME/postgresql.conf << EOF
+cat > ../../volumes/$SLAVE_NAME/postgresql.conf << EOF
 # Реплика
 listen_addresses = '*'
 primary_conninfo = 'host=$MASTER_HOST port=5432 user=replicator password=pass application_name=$SLAVE_NAME'

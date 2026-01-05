@@ -1,4 +1,4 @@
-package com.otus.highload.model;
+package com.otus.highload.model.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,7 +1,7 @@
 package com.otus.highload.controller;
 
 
-import com.otus.highload.model.User;
+import com.otus.highload.model.user.User;
 import com.otus.highload.security.AuthRequest;
 import com.otus.highload.security.AuthResponse;
 import com.otus.highload.security.RegisterResponse;

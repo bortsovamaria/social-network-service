@@ -1,7 +1,7 @@
 package com.otus.highload.mapper;
 
-import com.otus.highload.model.User;
-import com.otus.highload.model.UserResponse;
+import com.otus.highload.model.user.User;
+import com.otus.highload.model.user.UserResponse;
 import org.mapstruct.Mapper;
 
 import java.util.List;

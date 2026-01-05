@@ -41,10 +41,6 @@ echo "🔄 Creating asynchronous replica..."
 echo "⚡ Setting up synchronous replication..."
 ./05-setup-sync-replication.sh
 
-# Генерация данных
-echo "⚡ Setting up synchronous replication..."
-./06-generate.sh
-
 # Запускаем остальные сервисы
 echo "🚀 Starting all services..."
 docker-compose up -d

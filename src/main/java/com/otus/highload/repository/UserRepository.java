@@ -1,6 +1,6 @@
 package com.otus.highload.repository;
 
-import com.otus.highload.model.User;
+import com.otus.highload.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,7 +21,6 @@ import java.util.Optional;
 public class UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
-
 
     public User save(User user) {
         String sql = "INSERT INTO users (id, first_name, last_name, email, birthdate, biography, city, password, created_at) " +

@@ -1,3 +1,68 @@
+spring:
+  application:
+    name: social-network
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000 # 1 час
+      key-prefix: "cache:"
+      use-key-prefix: true
+      cache-null-values: false
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,metrics,prometheus
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    url: jdbc:postgresql://localhost:5433/social_network
+    user: postgres
+    password: postgres
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    time-zone: UTC
+
+app:
+  cache:
+    feed:
+      max-size: 1000
+      ttl-hours: 1
+  jwt:
+    secret: ${JWT_SECRET:mySuperSecretKeyThatIsAtLeast32CharactersLong!}
+    expiration: 86400000 # 24 часа
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,metrics,prometheus
+
+logging:
+  level:
+    com.otus.highload: INFO
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
+
+---
 
 spring:
   config:
@@ -9,41 +74,6 @@ spring:
       username: postgres
       password: postgres
       driver-class-name: org.postgresql.Driver
-      hikari:
-        maximum-pool-size: 2
-        connection-timeout: 60000
-        initialization-fail-timeout: 0
-
-app:
-  jwt:
-    secret: mySuperSecretKeyThatIsAtLeast32CharactersLong!
-    expiration: 86400000
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-    tags:
-      application: ${spring.application.name}
-  info:
-    env:
-      enabled: true
-
-logging:
-  level:
-    org.springframework.jdbc.datasource: DEBUG
 
 ---
 
@@ -58,56 +88,13 @@ spring:
       username: postgres
       password: postgres
       driver-class-name: org.postgresql.Driver
-      hikari:
-        maximum-pool-size: 2
-        connection-timeout: 60000
-        initialization-fail-timeout: 0
     slave:
       jdbc-url: jdbc:postgresql://localhost:5434/social_network
       username: postgres
       password: postgres
       driver-class-name: org.postgresql.Driver
-      hikari:
-        maximum-pool-size: 2
-        connection-timeout: 60000
-        initialization-fail-timeout: 0
     asyncslave:
       jdbc-url: jdbc:postgresql://localhost:5435/social_network
       username: postgres
       password: postgres
       driver-class-name: org.postgresql.Driver
-      hikari:
-        maximum-pool-size: 2
-        connection-timeout: 60000
-        initialization-fail-timeout: 0
-
-app:
-  jwt:
-    secret: mySuperSecretKeyThatIsAtLeast32CharactersLong!
-    expiration: 86400000
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-    tags:
-      application: ${spring.application.name}
-  info:
-    env:
-      enabled: true
-
-logging:
-  level:
-    org.springframework.jdbc.datasource: DEBUG

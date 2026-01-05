@@ -93,6 +93,47 @@ services:
     depends_on:
       - pgasyncslave
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command:
+      - redis-server
+      - --appendonly yes
+      - --bind 0.0.0.0
+      - --protected-mode no
+    volumes:
+      - redis-data:/data
+    networks:
+      - pgnet
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - pgnet
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
   app:
     build:
       context: .
@@ -112,12 +153,29 @@ services:
       SPRING_DATASOURCE_ASYNCSLAVE_JDBC_URL: jdbc:postgresql://pgasyncslave:5432/social_network
       SPRING_DATASOURCE_ASYNCSLAVE_USERNAME: postgres
       SPRING_DATASOURCE_ASYNCSLAVE_PASSWORD: postgres
-      SPRING_JPA_SHOW_SQL: "true"
-      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+
+      SPRING_LIQUIBASE_ENABLED: "true"
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://pgmaster:5432/social_network
+      SPRING_LIQUIBASE_USER: postgres
+      SPRING_LIQUIBASE_PASSWORD: postgres
+
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: ""
+
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC_DATASOURCE: DEBUG
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC_CORE: TRACE
     depends_on:
       pgmaster:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - pgnet
@@ -175,3 +233,5 @@ networks:
 volumes:
   prometheus_data:
   grafana_data:
+  redis-data:
+  rabbitmq-data:

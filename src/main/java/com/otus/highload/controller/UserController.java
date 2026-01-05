@@ -1,6 +1,6 @@
 package com.otus.highload.controller;
 
-import com.otus.highload.model.UserResponse;
+import com.otus.highload.model.user.UserResponse;
 import com.otus.highload.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

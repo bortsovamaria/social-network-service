@@ -2,8 +2,8 @@ package com.otus.highload.service;
 
 
 import com.otus.highload.security.AuthResponse;
-import com.otus.highload.model.User;
-import com.otus.highload.model.UserResponse;
+import com.otus.highload.model.user.User;
+import com.otus.highload.model.user.UserResponse;
 import com.otus.highload.security.JwtTokenProvider;
 import com.otus.highload.security.RegisterResponse;
 import lombok.RequiredArgsConstructor;
