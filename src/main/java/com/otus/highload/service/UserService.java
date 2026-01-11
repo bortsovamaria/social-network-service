@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -54,7 +53,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow();
     }
 }

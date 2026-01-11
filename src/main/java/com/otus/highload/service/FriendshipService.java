@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,16 +20,16 @@ public class FriendshipService {
     public void addFriendToUser(String friendId) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userEmail = principal.toString();
-        Optional<User> userOpt = userService.findByEmail(userEmail);
-        userOpt.ifPresent(user -> friendshipRepository.addFriend(userOpt.get().getId(), friendId));
+        User user = userService.findByEmail(userEmail);
+        friendshipRepository.addFriend(user.getId(), friendId);
     }
 
     @Transactional
     public void deleteFriendToUser(String friendId) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userEmail = principal.toString();
-        Optional<User> userOpt = userService.findByEmail(userEmail);
-        userOpt.ifPresent(user -> friendshipRepository.deleteFriend(userOpt.get().getId(), friendId));
+        User user = userService.findByEmail(userEmail);
+        friendshipRepository.deleteFriend(user.getId(), friendId);
     }
 
     public List<String> getFriendIds(String userId) {

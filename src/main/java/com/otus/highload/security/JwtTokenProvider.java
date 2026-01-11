@@ -21,26 +21,25 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
     
-    public String generateToken(String email) {
+    public String generateToken(String id) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
         
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(id)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }
     
-    public String getEmailFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
+    public String getUserIdFromToken(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
-                .getBody();
-        
-        return claims.getSubject();
+                .getBody()
+                .getSubject();
     }
     
     public boolean validateToken(String token) {

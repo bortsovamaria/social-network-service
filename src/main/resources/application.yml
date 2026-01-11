@@ -68,12 +68,12 @@ spring:
   config:
     activate:
       on-profile: master-only
-  datasource:
-    master:
-      jdbc-url: jdbc:postgresql://localhost:5433/social_network
-      username: postgres
-      password: postgres
-      driver-class-name: org.postgresql.Driver
+datasource:
+  master:
+    jdbc-url: jdbc:postgresql://localhost:5433/social_network
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
 
 ---
 

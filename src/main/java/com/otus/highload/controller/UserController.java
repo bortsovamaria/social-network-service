@@ -1,5 +1,6 @@
 package com.otus.highload.controller;
 
+import com.otus.highload.model.user.User;
 import com.otus.highload.model.user.UserResponse;
 import com.otus.highload.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,5 +23,10 @@ public class UserController {
     @GetMapping("/search")
     public List<UserResponse> searchUsers(@RequestParam String firstName, @RequestParam String lastName) {
         return userService.getByFirstNameAndLastName(firstName, lastName);
+    }
+
+    @GetMapping("/email/{email}")
+    public User searchUsers(@PathVariable String email) {
+        return userService.findByEmail(email);
     }
 }

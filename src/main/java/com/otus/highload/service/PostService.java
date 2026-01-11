@@ -3,7 +3,7 @@ package com.otus.highload.service;
 import com.otus.highload.mapper.PostMapper;
 import com.otus.highload.model.post.Post;
 import com.otus.highload.model.post.PostResponse;
-import com.otus.highload.model.user.User;
+import com.otus.highload.model.user.UserResponse;
 import com.otus.highload.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,13 +84,10 @@ public class PostService {
 
     @Cacheable(value = "feed", key = "'user_feed:' + #email", unless = "#result == null || #result.isEmpty()")
     @Transactional(readOnly = true)
-    public List<PostResponse> getFeed(String email) {
-        log.info("Get feed from DB for user: {}", email);
-        Optional<User> user = userService.findByEmail(email);
-        if (user.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-        List<String> friendIds = friendshipService.getFriendIds(user.get().getId());
+    public List<PostResponse> getFeed(String id) {
+        log.info("Get feed from DB for user: {}", id);
+        UserResponse user = userService.getById(id);
+        List<String> friendIds = friendshipService.getFriendIds(user.getId());
         if (friendIds.isEmpty()) {
             return List.of();
         }

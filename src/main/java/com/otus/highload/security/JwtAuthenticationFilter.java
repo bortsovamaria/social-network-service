@@ -27,11 +27,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = getTokenFromRequest(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            String email = jwtTokenProvider.getEmailFromToken(token);
+            String id = jwtTokenProvider.getUserIdFromToken(token);
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, null);
+                        new UsernamePasswordAuthenticationToken(id, null, null);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
