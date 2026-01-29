@@ -22,6 +22,11 @@ public class PostController {
         return postService.createPost(post);
     }
 
+    @PostMapping("/ws")
+    public Post createPostWs(@RequestBody Post post) {
+        return postService.createPostWs(post);
+    }
+
     @PutMapping
     public Post update(@RequestBody Post post) {
        return postService.update(post);

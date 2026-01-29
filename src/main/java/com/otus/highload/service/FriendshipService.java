@@ -19,9 +19,7 @@ public class FriendshipService {
     @Transactional
     public void addFriendToUser(String friendId) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userEmail = principal.toString();
-        User user = userService.findByEmail(userEmail);
-        friendshipRepository.addFriend(user.getId(), friendId);
+        friendshipRepository.addFriend(principal.toString(), friendId);
     }
 
     @Transactional

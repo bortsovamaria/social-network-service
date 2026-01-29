@@ -8,8 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,7 +31,7 @@ public class PostRepository {
     }
 
     public void delete(String id) {
-        String sql = "DELETE posts where id = ?";
+        String sql = "DELETE FROM posts WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }
 
@@ -40,12 +39,6 @@ public class PostRepository {
         String sql = "SELECT id, text, author_id, created_at FROM posts WHERE id = ?";
         List<Post> posts = jdbcTemplate.query(sql, postRowMapper, id);
         return posts.isEmpty() ? Optional.empty() : Optional.of(posts.get(0));
-    }
-
-    public Optional<List<Post>> findByAuthorId(String authorId) {
-        String sql = "SELECT id, text, authorId, createdAt FROM posts " +
-                "WHERE authorId = ?";
-        return Optional.of(jdbcTemplate.query(sql, postRowMapper, authorId));
     }
 
     public List<Post> getFeed(List<String> friendIds) {

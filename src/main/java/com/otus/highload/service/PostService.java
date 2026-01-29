@@ -11,12 +11,12 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -26,11 +26,26 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final FriendshipService friendshipService;
+    private final WebSocketNotificationService webSocketService;
+    private final RabbitService rabbitService;
     private final UserService userService;
     private final CacheManager cacheManager;
     private final FeedUpdateService feedUpdateService;
     private final PostMapper postMapper;
 
+    @Transactional
+    public Post createPostWs(Post post) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        post.setId(UUID.randomUUID().toString());
+        post.setAuthorId(userId);
+        post.setCreatedAt(LocalDateTime.now());
+        Post savedPost = postRepository.save(post);
+        List<String> followerIds = friendshipService.getFollowerIds(userId);
+        rabbitService.sendPostToQueue(savedPost, List.copyOf(followerIds));
+        webSocketService.notifyAll(savedPost);
+        log.info("Post created: {}", savedPost.getId());
+        return savedPost;
+    }
 
     @CacheEvict(value = "feed", key = "#post.authorId")
     @Transactional
@@ -56,34 +71,22 @@ public class PostService {
 
     @Transactional
     public Post update(Post post) {
-        Optional<Post> postOpt = postRepository.findById(post.getId());
-        if (postOpt.isPresent()) {
-            return postRepository.save(post);
-        }
-        throw new IllegalArgumentException();
-    }
-
-    @Transactional
-    public void delete(String id) {
-        Optional<Post> postOpt = postRepository.findById(id);
-        postOpt.ifPresent(p -> {
-            postRepository.delete(id);
-            feedUpdateService.notifyFeedUpdate(p.getAuthorId());
-        });
+        return postRepository.save(post);
     }
 
     @Transactional(readOnly = true)
     public Post findById(String id) {
-        return postRepository.findById(id).orElseThrow();
+        return postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+    }
+
+    @Transactional
+    public void delete(String id) {
+        postRepository.delete(id);
     }
 
     @Transactional(readOnly = true)
-    public List<Post> findByAuthorId(String authorId) {
-        return postRepository.findByAuthorId(authorId).orElseThrow();
-    }
-
     @Cacheable(value = "feed", key = "'user_feed:' + #email", unless = "#result == null || #result.isEmpty()")
-    @Transactional(readOnly = true)
     public List<PostResponse> getFeed(String id) {
         log.info("Get feed from DB for user: {}", id);
         UserResponse user = userService.getById(id);

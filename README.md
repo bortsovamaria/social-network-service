@@ -192,3 +192,120 @@ WHERE p.author_id IN (
 - Затраты на память Redis
 - Сложность отладки при проблемах с кешем
 
+
+## 3.  Домашнее задание по очередям
+
+Сделано:
+
+* Создание поста (метод /post/create из спецификации)
+* Асинхронное API с websocket:
+Реализовать отправку сообщений в канал /post/feed/posted через websocket, при добавлении нового поста друга подписчику websocket'а приходит событие о новом посте
+* Реализовать отложенную материализацию ленты:
+  Формирование лент работает через очередь (отложено)
+  Обеспечена отправка только целевым пользователям
+
+
+###  Тестовый пользователь
+| Поле | Значение |
+|------|----------|
+| **Email** | `test.user@example.com` |
+| **Пароль** | `password` |
+
+###  Подготовка инфраструктуры
+
+#### 1. **Запуск окружения**
+```bash
+./start-all из папки scripts/replication-hw/
+```
+**Выполняет:**
+-  Инициализация мастера
+-  Создание пользователя replicator
+-  Конфигурация аутентификации
+-  Бэкап и создание реплик
+-  Настройка синхронной реплики
+
+#### 2. **Генерация тестовых данных**
+```bash
+scripts/generate-all-data-for-test.sh
+```
+**Создает:**
+- Пользователей
+- Посты
+- Дружеские связи
+
+### 🧪 Тестирование вебсокета
+
+Проверить, что в UI Rabbit есть exchange, queues, routing key
+
+```bash
+
+# 1. Регистрация
+curl -X POST http://localhost:8080/v0/api/auth/register \
+   -H "Content-Type: application/json" \
+   -d '{
+    "firstName": "Maria",
+    "lastName": "Bortsova",
+    "birthDate": "1996-01-01T10:00:00",
+    "biography": "Java Developer",
+    "city": "Moscow",
+    "email": "maria12@test.com",
+    "password": "123456"
+}' 
+
+curl -X POST http://localhost:8080/v0/api/auth/register \
+   -H "Content-Type: application/json" \
+   -d '{
+    "firstName": "Maria",
+    "lastName": "Friend",
+    "birthDate": "1996-01-01T10:00:00",
+    "biography": "Python Developer",
+    "city": "Moscow",
+    "email": "maria1243@test.com",
+    "password": "123456"
+}'
+   
+# 2.  Аутентификация
+curl -X POST http://localhost:8080/v0/api/auth/login \
+   -H "Content-Type: application/json" \
+   -d '{
+    "email": "maria1243@test.com",
+    "password": "123456"
+}'
+
+# 3.  Добавить друга
+curl -X POST http://localhost:8080/v0/api/users/email/maria12@test.com \
+   -H "Content-Type: application/json" \
+   -d '{
+    "email": "maria1243@test.com",
+    "password": "123456"
+}'
+-- id = fa4761f2-8826-40cb-ae9e-61d8a4a33f7f
+
+curl -X POST http://localhost:8080/v0/api/friendship/fa4761f2-8826-40cb-ae9e-61d8a4a33f7f \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json"
+    
+# 3.  Создать пост
+curl -X POST http://localhost:8080/v0/api/posts/ws \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{
+    "text": "Мой первый пост!"
+}'
+```
+
+Откройте http://localhost:15672 → Queues → увидите сообщения в очередях
+
+В логах можно увидеть, что вебсокет работает
+
+```
+2026-01-31T15:33:40.498+03:00 DEBUG 8600 --- [social-network] [nio-8080-exec-3] o.s.m.s.b.SimpleBrokerMessageHandler     : Processing MESSAGE destination=/topic/feed session=null payload={"type":"post.posted","data":{"id":"7241445a-170a-48cb-94e7-7e141b8f3a5e","text"...(truncated)
+2026-01-31T15:33:40.498+03:00  INFO 8600 --- [social-network] [nio-8080-exec-3] c.o.h.s.WebSocketNotificationService     : Broadcast WebSocket notification for post: 7241445a-170a-48cb-94e7-7e141b8f3a5e
+2026-01-31T15:33:40.498+03:00  INFO 8600 --- [social-network] [nio-8080-exec-3] com.otus.highload.service.PostService    : Post created: 7241445a-170a-48cb-94e7-7e141b8f3a5e
+2026-01-31T15:33:40.501+03:00  INFO 8600 --- [social-network] [ntContainer#1-1] c.otus.highload.service.RabbitConsumer   : Processing regular post: 7241445a-170a-48cb-94e7-7e141b8f3a5e
+2026-01-31T15:34:31.349+03:00  INFO 8600 --- [social-network] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+
+```
+
+
+
