@@ -17,14 +17,18 @@ public class WebSocketNotificationService {
     private final SimpMessagingTemplate messagingTemplate;
     private final ObjectMapper objectMapper;
 
-    public void notifyAll(Post post) {
+    public void notify(Post post, String userId) {
         try {
             PostNotification notification = new PostNotification(
                     "post.posted",
                     new PostData(post.getId(), post.getText(), post.getAuthorId())
             );
             String message = objectMapper.writeValueAsString(notification);
-            messagingTemplate.convertAndSend("/topic/feed", message);
+            messagingTemplate.convertAndSendToUser(
+                    userId,
+                    "/queue/feed",
+                    message
+            );
             log.info("Broadcast WebSocket notification for post: {}", post.getId());
         } catch (Exception e) {
             log.error("Failed to send broadcast notification", e);

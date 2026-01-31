@@ -299,7 +299,7 @@ curl -X POST http://localhost:8080/v0/api/posts/ws \
 В логах можно увидеть, что вебсокет работает
 
 ```
-2026-01-31T15:33:40.498+03:00 DEBUG 8600 --- [social-network] [nio-8080-exec-3] o.s.m.s.b.SimpleBrokerMessageHandler     : Processing MESSAGE destination=/topic/feed session=null payload={"type":"post.posted","data":{"id":"7241445a-170a-48cb-94e7-7e141b8f3a5e","text"...(truncated)
+2026-01-31T15:33:40.498+03:00 DEBUG 8600 --- [social-network] [nio-8080-exec-3] o.s.m.s.b.SimpleBrokerMessageHandler     : Processing MESSAGE destination=/queue/feed session=null payload={"type":"post.posted","data":{"id":"7241445a-170a-48cb-94e7-7e141b8f3a5e","text"...(truncated)
 2026-01-31T15:33:40.498+03:00  INFO 8600 --- [social-network] [nio-8080-exec-3] c.o.h.s.WebSocketNotificationService     : Broadcast WebSocket notification for post: 7241445a-170a-48cb-94e7-7e141b8f3a5e
 2026-01-31T15:33:40.498+03:00  INFO 8600 --- [social-network] [nio-8080-exec-3] com.otus.highload.service.PostService    : Post created: 7241445a-170a-48cb-94e7-7e141b8f3a5e
 2026-01-31T15:33:40.501+03:00  INFO 8600 --- [social-network] [ntContainer#1-1] c.otus.highload.service.RabbitConsumer   : Processing regular post: 7241445a-170a-48cb-94e7-7e141b8f3a5e

@@ -41,8 +41,12 @@ public class PostService {
         post.setCreatedAt(LocalDateTime.now());
         Post savedPost = postRepository.save(post);
         List<String> followerIds = friendshipService.getFollowerIds(userId);
-        rabbitService.sendPostToQueue(savedPost, List.copyOf(followerIds));
-        webSocketService.notifyAll(savedPost);
+        if (!followerIds.isEmpty()) {
+            rabbitService.sendPostToQueue(savedPost, List.copyOf(followerIds));
+            for (String followerId : followerIds) {
+                webSocketService.notify(savedPost, followerId);
+            }
+        }
         log.info("Post created: {}", savedPost.getId());
         return savedPost;
     }
